@@ -5,26 +5,28 @@
 # ══════════════════════════════════════════════════════
 
 import os
+from dotenv import load_dotenv
 
-# ── Ollama ─────────────────────────────────────────────
-# Ollama runs locally on port 11434 — doesn't require a strong GPU
-# Run the model first: ollama pull qwen2.5-coder:7b
-#
-# If running on Colab + ngrok, set the URL in PowerShell:
-#   $env:OLLAMA_NGROK_URL = "https://xxxx-xx-xx.ngrok-free.app"
-#   python main.py
-#
-# If running locally, leave it as is
-# Reads from env var OLLAMA_NGROK_URL first, falls back to local
-OLLAMA_BASE_URL = os.getenv("OLLAMA_NGROK_URL", "http://localhost:11434")
-OLLAMA_MODEL    = "qwen2.5-coder:7b"   # lightweight model — runs on 8 GB RAM
-OLLAMA_API_KEY  = "ollama"   # Local Ollama doesn't require a real API key
+# Load environment variables from .env file
+load_dotenv()
+
+# ── OpenRouter ─────────────────────────────────────────────
+# Using OpenRouter with a fast, reliable model
+# API key stored in .env file
+# Model options (all fast/free):
+#   - mistral/mistral-7b (FAST, recommended)
+#   - mistral/mistral-medium
+#   - meta-llama/llama-2-7b
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
+OPENROUTER_MODEL_DISPLAY = "NVIDIA Nemotron-3 Super 120B (OpenRouter)"
 
 LLM_TEMPERATURE = 0.2   # Lower means more consistent and less creative responses
                          # Suitable for code since we want specific, non-random results
 
 # ── Agent ──────────────────────────────────────────────
-MAX_RETRIES = 5
+MAX_RETRIES = 10
 # If Critic says RETRY more than this, we stop and consider it a success
 # to avoid infinite loops
 

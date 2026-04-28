@@ -23,6 +23,7 @@ if sys.stdout.encoding != "utf-8":
 
 from agent.graph import run_agent
 from sandbx.docker_runner import DockerSandbox
+from config import OPENROUTER_MODEL_DISPLAY
 
 
 # ══════════════════════════════════════════════════════
@@ -97,7 +98,7 @@ def main():
     # ── Header ──
     print("\n" + "═" * 55)
     print("  🤖 Multi-Agent Coding Assistant")
-    print("  Model: Ollama → qwen2.5-coder:7b")
+    print(f"  Model: {OPENROUTER_MODEL_DISPLAY}")
     print("═" * 55)
 
     # ── Set Workspace ──
@@ -141,13 +142,35 @@ def main():
     signal.signal(signal.SIGTERM, cleanup)
 
     print("\n  Type your request or 'exit' to quit")
+    print("  (Press Enter twice to submit multi-line input)")
     print("  ─" * 27)
 
     # ── Chat Loop ──
     while True:
         print()
         try:
-            user_input = input("  You: ").strip()
+            # Read first line
+            first_line = input("  You: ").strip()
+            
+            if not first_line:
+                continue
+            
+            if first_line.lower() in ("exit", "quit"):
+                cleanup()
+            
+            # Collect additional lines if user continues typing
+            lines = [first_line]
+            while True:
+                try:
+                    next_line = input("       ").rstrip()
+                    if not next_line:  # Empty line signals end of input
+                        break
+                    lines.append(next_line)
+                except EOFError:
+                    break
+            
+            user_input = "\n".join(lines)
+            
         except EOFError:
             cleanup()
 

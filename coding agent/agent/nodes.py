@@ -16,18 +16,22 @@ from agent.tools import (
 )
 from config import (
     LLM_TEMPERATURE, MAX_RETRIES, RESEARCHER_MAX_ROUNDS,
-    OLLAMA_API_KEY, OLLAMA_BASE_URL, OLLAMA_MODEL,
+    OPENROUTER_API_KEY, OPENROUTER_BASE_URL, OPENROUTER_MODEL,
 )
 from sandbx.docker_runner import DockerSandbox
 
 # ── LLM ──────────────────────────────────────────────────────────────────────
 llm = ChatOpenAI(
-    model=OLLAMA_MODEL, base_url=OLLAMA_BASE_URL,
-    api_key=OLLAMA_API_KEY, temperature=LLM_TEMPERATURE,
+    model=OPENROUTER_MODEL,
+    base_url=OPENROUTER_BASE_URL,
+    api_key=OPENROUTER_API_KEY,
+    temperature=LLM_TEMPERATURE,
+    timeout=120,  # 2 minute timeout for API calls
+    max_retries=3,
 )
 
 # ── LLM call with retry ───────────────────────────────────────────────────────
-def _llm_invoke(messages: List[BaseMessage], max_attempts: int = 3) -> BaseMessage:
+def _llm_invoke(messages: List[BaseMessage], max_attempts: int = 4) -> BaseMessage:
     last_exc = None
     for attempt in range(max_attempts):
         try:
@@ -35,10 +39,11 @@ def _llm_invoke(messages: List[BaseMessage], max_attempts: int = 3) -> BaseMessa
         except Exception as exc:
             last_exc = exc
             msg = str(exc).lower()
-            if any(k in msg for k in ("502","ngrok","connection","timeout","reset")):
+            # Retry on these errors: timeout, connection, 502 (bad gateway), 524 (timeout), ngrok issues
+            if any(k in msg for k in ("502","524","ngrok","connection","timeout","reset","gateway")):
                 if attempt < max_attempts - 1:
-                    wait = 2 ** attempt
-                    print(f"\n  [llm] retrying in {wait}s: {exc}")
+                    wait = 3 ** attempt  # Exponential backoff: 1s, 3s, 9s, 27s
+                    print(f"\n  [llm] retrying in {wait}s: {str(exc)[:80]}")
                     time.sleep(wait)
                     continue
             raise
