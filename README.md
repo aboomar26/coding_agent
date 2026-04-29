@@ -5,21 +5,21 @@
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue.svg)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](#license)
 
-> **Autonomous AI-powered coding assistant** that plans, writes, reviews, and executes code in an isolated sandbox environment.  
-> Built with **LangGraph**, **LangChain**, **OpenRouter**, and **Docker** for safety and modularity.
+> **Production-ready autonomous AI-powered coding assistant** that autonomously plans, writes, reviews, and executes code in an isolated sandbox environment.  
+> Built with **LangGraph**, **LangChain**, **OpenRouter**, and **Docker** for enterprise-grade safety, reliability, and modularity.
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-- 🧠 **Multi-Agent Pipeline**: Planner → Researcher → Writer → Executor → Critic → Finalizer
-- 🔍 **Code Analysis**: Reads existing files and understands project context
-- ✅ **Human-in-the-Loop**: Ask for approval before executing any changes
-- 🐳 **Docker Sandbox**: Execute code safely in isolated containers
-- 📝 **Intelligent Planning**: Creates step-by-step execution plans
-- 🔄 **Retry Logic**: Automatically recovers from transient errors
-- 💾 **File Management**: Edit, create, and manage files with git-like precision
-- ⚡ **Fast Models**: Uses OpenRouter for access to high-performance LLMs
+- **🧠 Multi-Agent Pipeline**: Orchestrated workflow (Planner → Researcher → Writer → Executor → Critic → Finalizer) for comprehensive code generation
+- **🔍 Contextual Code Analysis**: Reads and understands existing codebase structure for informed decision-making
+- **✅ Human-in-the-Loop Approval**: Request explicit approval before executing any changes—maintaining full control
+- **🐳 Docker Sandbox Execution**: Isolated container execution ensures zero impact on the host system
+- **📝 Intelligent Planning**: Creates detailed, step-by-step execution plans before implementation
+- **🔄 Robust Retry Logic**: Automatic recovery from transient errors with exponential backoff
+- **💾 Precision File Management**: Edit, create, and manage files with granular control
+- **⚡ High-Performance LLM Access**: Leverages OpenRouter for access to state-of-the-art models
 
 ---
 
@@ -33,6 +33,7 @@
 - [Architecture](#-architecture)
 - [Project Structure](#-project-structure)
 - [Troubleshooting](#-troubleshooting)
+- [Skills](#skills)
 - [License](#license)
 
 ---
@@ -40,21 +41,21 @@
 ## 🚀 Quick Start
 
 ```bash
-# 1. Clone and navigate to project
-git clone <repo-url>
+# 1. Clone repository and navigate to project directory
+git clone <repository-url>
 cd coding-agent
 
-# 2. Install dependencies
+# 2. Install Python dependencies
 pip install -r Requirements.txt
 
-# 3. Set up environment variables
-# Create a .env file with your OpenRouter API key
+# 3. Configure environment variables
+# Create .env file with your OpenRouter API key (see Prerequisites)
 echo "OPENROUTER_API_KEY=your-key-here" > .env
 
-# 4. Ensure Docker is running (optional but recommended)
+# 4. Verify Docker setup (optional but recommended for production)
 docker ps
 
-# 5. Run the agent
+# 5. Launch the agent
 python main.py
 ```
 
@@ -62,13 +63,15 @@ python main.py
 
 ## 📦 Prerequisites
 
-- **Python 3.10+** — [Download](https://www.python.org/)
-- **Docker Desktop** (optional but recommended) — [Download](https://www.docker.com/products/docker-desktop)
-- **OpenRouter API Key** (free tier available) — [Get Key](https://openrouter.ai)
+Before starting, ensure you have the following installed:
 
-### Environment Variables
+- **Python 3.10+** — [Download](https://www.python.org/) — Required runtime environment
+- **Docker Desktop** (optional but recommended) — [Download](https://www.docker.com/products/docker-desktop) — For isolated code execution
+- **OpenRouter API Key** (free tier available) — [Get Key](https://openrouter.ai) — For LLM inference
 
-Create a `.env` file in the project root:
+### Environment Configuration
+
+Create a `.env` file in the project root directory with your API credentials:
 
 ```env
 OPENROUTER_API_KEY=sk-or-v1-your-api-key-here
@@ -84,18 +87,22 @@ OPENROUTER_API_KEY=sk-or-v1-your-api-key-here
 pip install -r Requirements.txt
 ```
 
+All required packages will be installed with compatible versions.
+
 ### Step 2: Configure API Key
 
-1. Sign up for free at [OpenRouter.ai](https://openrouter.ai)
+1. Sign up for a free account at [OpenRouter.ai](https://openrouter.ai)
 2. Navigate to **Settings → API Keys**
 3. Create a new API key
-4. Add to `.env` file:
+4. Add the key to your `.env` file:
 
 ```env
 OPENROUTER_API_KEY=sk-or-v1-xxxxx
 ```
 
-### Step 3: Set Up Docker (Optional)
+### Step 3: Set Up Docker (Optional but Recommended)
+
+For production environments, Docker provides isolated execution:
 
 ```bash
 # Windows
@@ -113,67 +120,68 @@ docker --version
 
 ## ⚙️ Configuration
 
-Edit `config.py` to customize behavior:
+Edit `config.py` to customize system behavior for your specific requirements:
 
 ```python
-# LLM Configuration
+# LLM Model Configuration
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 OPENROUTER_MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
-LLM_TEMPERATURE = 0.2
+LLM_TEMPERATURE = 0.2  # Lower values = more deterministic output
 
-# Agent Settings
-MAX_RETRIES = 10
-RESEARCHER_MAX_ROUNDS = 6
+# Agent Pipeline Configuration
+MAX_RETRIES = 10  # Maximum retry attempts for failed operations
+RESEARCHER_MAX_ROUNDS = 6  # Maximum research iterations
 
-# Docker Sandbox
-SANDBOX_IMAGE = "python:3.12-slim"
-SANDBOX_MEMORY = "512m"
-SANDBOX_CPUS = "1.0"
-SANDBOX_TIMEOUT = 120
+# Docker Sandbox Configuration
+SANDBOX_IMAGE = "python:3.12-slim"  # Base container image
+SANDBOX_MEMORY = "512m"  # Memory limit per container
+SANDBOX_CPUS = "1.0"  # CPU allocation
+SANDBOX_TIMEOUT = 120  # Execution timeout in seconds
 ```
 
-### Changing the LLM Model
+### Available Models
 
-Available free models on OpenRouter:
-- `nvidia/nemotron-3-super-120b-a12b:free`
+Browse [OpenRouter's model catalog](https://openrouter.ai/docs#models) for alternative models. Free-tier options include:
+- `nvidia/nemotron-3-super-120b-a12b:free` (recommended)
 - `meta-llama/llama-2-7b:free`
 
 ---
 
 ## 💻 Usage
 
-### Run the Agent
+### Running the Agent
 
 ```bash
-# Interactive mode (prompts for directory)
+# Interactive mode (prompts for workspace directory)
 python main.py
 
-# Specify directory directly
+# Direct mode (specify workspace)
 python main.py --workspace ./my-project
 
-# Without Docker sandbox (quick testing)
+# Development mode (without Docker sandbox)
 python main.py --workspace ./my-project --no-sandbox
-
 ```
 
 ### Example Requests
 
+The agent accepts natural language requests for code-related tasks:
+
 ```
-❯ create a Python script that reads a CSV and draws a bar chart
+❯ Create a Python script that reads a CSV file and generates a bar chart
 
-❯ create a FastAPI app with /health and /predict endpoints
+❯ Build a FastAPI application with /health and /predict endpoints
 
-❯ create a utils folder with helpers.py containing date manipulation functions
+❯ Create a utils folder with helpers.py containing date manipulation functions
 
-❯ fix the bug in app.py — the function calculate_total returns wrong value
+❯ Debug the bug in app.py where the calculate_total function returns incorrect values
 
-❯ write unit tests for all functions in utils/helpers.py
+❯ Generate comprehensive unit tests for all functions in utils/helpers.py
 ```
 
-### Approval Gate
+### Approval Workflow
 
-When the agent proposes changes, you'll be asked for approval:
+When the agent proposes changes, you will be prompted for approval before execution:
 
 ```
 [1/2] edit_file
@@ -185,8 +193,8 @@ Do you approve? (y/n):
 
 | Option | Action |
 |--------|--------|
-| `y` | ✅ Approve and execute |
-| `n` | ⏭️ Skip (won't execute) |
+| `y` | ✅ Approve and execute changes |
+| `n` | ⏭️ Skip (propose next change) |
 
 ---
 
@@ -194,38 +202,42 @@ Do you approve? (y/n):
 
 ### Agent Pipeline
 
+The system implements a sophisticated multi-agent orchestration pattern:
+
 ```
-User Input
+User Input (Natural Language)
     ↓
 ┌─────────────────────────────┐
-│  🧠 PLANNER                 │ Creates numbered plan
+│  🧠 PLANNER                 │ Decomposes task into numbered steps
 ├─────────────────────────────┤
-│  🔍 RESEARCHER              │ Reads existing files
+│  🔍 RESEARCHER              │ Analyzes existing codebase
 ├─────────────────────────────┤
-│  ✍️  WRITER                 │ Generates execution tasks
+│  ✍️  WRITER                 │ Generates implementation tasks
 ├─────────────────────────────┤
-│  ⚙️  EXECUTOR               │ Asks for approval & executes
+│  ⚙️  EXECUTOR               │ Requests approval & executes
 ├─────────────────────────────┤
-│  👨‍⚖️ CRITIC                 │ Validates results
+│  👨‍⚖️ CRITIC                 │ Validates code quality & correctness
 ├─────────────────────────────┤
-│  📋 FINALIZER               │ Summarizes changes
+│  📋 FINALIZER               │ Summarizes changes & outcomes
 └─────────────────────────────┘
     ↓
-   Done
+   Output Summary
 ```
 
-### Docker Sandbox Isolation
+### Execution Environment: Docker Sandbox
+
+Code execution is completely isolated from the host system:
 
 ```
-Your Machine                Docker Container
-─────────────────          ─────────────────────
-./my-project/   ↔─────→   /workspace/
-  ├─ app.py              app.py
-  ├─ utils/              utils/
-  └─ config.py           config.py
+Host System                    Docker Container
+─────────────────────────      ──────────────────────
+./my-project/      ↔─────→    /workspace/
+  ├─ app.py                  app.py
+  ├─ utils/                  utils/
+  └─ config.py               config.py
 
-File editing happens    Code execution happens here
-directly via Python     (isolated, safe environment)
+Python code executed here,     Results returned safely
+changes proposed to user       (zero risk to host)
 ```
 
 ---
@@ -235,124 +247,149 @@ directly via Python     (isolated, safe environment)
 ```
 coding-agent/
 │
-├── main.py                      Entry point
-├── config.py                    All configuration settings
-├── Requirements.txt             Python dependencies
-├── .env                         API keys (don't commit!)
-├── README.md                    This file
+├── main.py                      Application entry point
+├── config.py                    Centralized configuration & constants
+├── Requirements.txt             Python package dependencies
+├── .env                         API credentials (git-ignored)
+├── README.md                    Project documentation
 │
 ├── agent/
 │   ├── __init__.py
-│   ├── graph.py                LangGraph workflow definition
-│   ├── nodes.py                Agent nodes (Planner, Researcher, Writer, etc.)
-│   └── tools.py                Tools for file & code management
+│   ├── graph.py                LangGraph workflow definition & orchestration
+│   ├── nodes.py                Individual agent node implementations
+│   └── tools.py                File management & execution tools
 │
 ├── sandbx/
 │   ├── __init__.py
-│   └── docker_runner.py        Docker sandbox execution
+│   └── docker_runner.py        Docker container management & execution
 │
 └── llm/
-    └── Ollama_ngrok.ipynb      (Optional) Run Ollama on Google Colab
+    └── Ollama_ngrok.ipynb      Optional: Run Ollama on Google Colab
 ```
 
 ---
 
 ## 🔧 Troubleshooting
 
-### ❌ "Error code: 401 - User not found"
+### ❌ Error: "401 - User not found"
 
-**Problem**: API key is invalid or expired.
+**Cause**: Invalid or expired OpenRouter API key
 
 **Solution**:
-1. Visit [OpenRouter.ai](https://openrouter.ai/keys)
-2. Delete old key and create a new one
-3. Update `.env` file with new key
-4. Restart the agent
+1. Visit [OpenRouter API Keys](https://openrouter.ai/keys)
+2. Revoke the old key and create a new one
+3. Update your `.env` file with the new key
+4. Restart the application
 
-### ❌ "Cannot connect to Docker daemon"
+---
 
-**Problem**: Docker isn't running or not installed.
+### ❌ Error: "Cannot connect to Docker daemon"
+
+**Cause**: Docker is not running or not properly installed
 
 **Solution**:
 ```bash
-# Windows: Start Docker Desktop from Start Menu
+# Windows: Start Docker Desktop from the Start Menu
 # Linux: sudo systemctl start docker
-docker ps  # Verify it's running
+# macOS: Open Docker.app
+
+# Verify Docker is running
+docker ps
 ```
 
-### ❌ "ModuleNotFoundError: No module named 'langchain'"
+---
 
-**Problem**: Dependencies not installed.
+### ❌ Error: "ModuleNotFoundError: No module named 'langchain'"
+
+**Cause**: Python dependencies not installed
 
 **Solution**:
 ```bash
 pip install -r Requirements.txt --upgrade
 ```
 
-### ❌ "Connection refused" or "timeout"
+---
 
-**Problem**: OpenRouter API is unreachable or too slow.
+### ❌ Error: "Connection refused" or "timeout"
+
+**Cause**: OpenRouter API unreachable or slow network
 
 **Solution**:
-- Check internet connection
-- Verify API key is valid
-- Try a different model in `config.py`
-- Check [OpenRouter status page](https://status.openrouter.ai)
+- Verify internet connection
+- Check API key validity
+- Try an alternative model in `config.py`
+- Monitor [OpenRouter status page](https://status.openrouter.ai)
+- Check local firewall settings
 
 ---
 
 ## 📋 Requirements
 
-| Requirement | Version | Purpose |
-|-------------|---------|---------|
-| Python | 3.10+ | Runtime |
-| LangGraph | Latest | Agent orchestration |
-| LangChain | Latest | LLM integration |
-| Docker | Latest | Sandbox execution |
-| OpenRouter API Key | (free) | LLM inference |
+| Component | Version | Purpose |
+|-----------|---------|---------|
+| Python | 3.10+ | Runtime environment |
+| LangGraph | Latest | Multi-agent orchestration framework |
+| LangChain | Latest | LLM integration & chain management |
+| Docker | Latest | Containerized code execution |
+| OpenRouter API | Free tier available | LLM inference access |
+
+For complete dependency list, see [Requirements.txt](Requirements.txt)
 
 ---
 
 ## ⚠️ Important Notes
 
-- ✅ **Safe by Default**: All changes require your approval before execution
-- 🐳 **Isolated Execution**: Code runs in Docker containers, never on your machine
-- 📁 **Directory-Specific**: Creates/modifies files only in your selected workspace
-- 💾 **No Auto-Commit**: Changes are not automatically committed to git
-- 🔑 **Never Share Keys**: Keep API keys secret; add `.env` to `.gitignore`
+- ✅ **Safe by Default**: All changes require explicit user approval before execution
+- 🐳 **Isolated Execution**: Code runs exclusively within Docker containers—zero impact on host system
+- 📁 **Workspace-Scoped**: Only creates or modifies files within the specified workspace directory
+- 💾 **No Auto-Commit**: Changes are not automatically committed to version control
+- 🔑 **Credential Security**: Never share API keys; ensure `.env` is added to `.gitignore`
+- 🧪 **Testing**: Always review generated code for correctness before production deployment
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please:
+We welcome contributions from the community! To contribute:
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/improvement`)
-3. Commit changes (`git commit -am 'Add improvement'`)
-4. Push to branch (`git push origin feature/improvement`)
-5. Open a Pull Request
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feature/your-improvement`
+3. **Commit** your changes: `git commit -am 'Add your improvement'`
+4. **Push** to the branch: `git push origin feature/your-improvement`
+5. **Open** a Pull Request with a detailed description of your changes
+
+Please ensure your code follows the existing style and includes appropriate tests.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**—a permissive open-source license. See the [LICENSE](LICENSE) file for full details.
 
 ---
 
 ## 📞 Support
 
-- **Issues**: [Open an issue on GitHub](../../issues)
-- **Discussions**: [GitHub Discussions](../../discussions)
-- **Documentation**: See [README.md](README.md)
+For questions, issues, or contributions:
+
+- **Issues**: [Open an issue on GitHub](../../issues) for bug reports or feature requests
+- **Discussions**: [GitHub Discussions](../../discussions) for questions and community support
+- **Documentation**: See [README.md](README.md) for detailed usage information
 
 ---
 
 ## 🎓 Disclaimer
 
-This tool generates and executes code automatically. While it includes safety measures:
-- Always review generated code before approval
-- Use in isolated environments when possible
-- Test thoroughly before production use
-- Keep backups of important files
+**Important**: This tool generates and executes code autonomously. While it includes safety measures and isolation features, please follow these best practices:
+
+- Always review generated code for correctness and security before approval
+- Test thoroughly in development environments before production use
+- Maintain backups of important files before making changes
+- Use Docker sandbox execution for maximum safety
+- Monitor LLM output for unexpected behaviors or errors
+
+---
+
+## 🛠️ Skills
+
+`LangGraph` · `LangChain` · `multi-agent systems` · `prompt engineering` · `Docker` · `Python` · `REST APIs` · `async Python` · `file management` · `error handling` · `code analysis` · `LLM reasoning` · `chain-of-thought` · `human-in-the-loop` · `OpenRouter API` · `CLI development`
